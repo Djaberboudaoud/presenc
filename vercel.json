@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npm install --include=dev && npm run build",
+  "outputDirectory": "dist/client",
+  "build": {
+    "env": {
+      "VITE_API_URL": "https://precenceback.vercel.app"
+    }
+  },
+  "env": {
+    "VITE_API_URL": "https://precenceback.vercel.app"
+  }
+}

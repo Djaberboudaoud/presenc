@@ -169,6 +169,13 @@ export const studentsApi = {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
+  bulkUpdateStatus: (
+    updates: { ID: string; status: string; niveau?: string; filiere?: string; matiere?: string }[]
+  ) =>
+    request<{ message: string }>("/api/students/bulk-status", {
+      method: "PATCH",
+      body: JSON.stringify({ updates }),
+    }),
   resetStatus: () =>
     request<{ message: string }>("/api/students/reset-status", {
       method: "POST",

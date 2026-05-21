@@ -130,16 +130,14 @@ function AttendancePage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Loop over students and update status if modified
-      const promises = students.map(s => 
-        studentsApi.updateStatus(s.ID, {
-          status: s.status === "absent" ? "غائب" : "حاضر",
-          niveau: s.NIVEAU || undefined,
-          filiere: s.FILIERE || undefined,
-          matiere: matiereId || undefined, // or s.MATIERE
-        })
-      );
-      await Promise.all(promises);
+      const updates = students.map(s => ({
+        ID: s.ID,
+        status: s.status === "absent" ? "غائب" : "حاضر",
+        niveau: s.NIVEAU || undefined,
+        filiere: s.FILIERE || undefined,
+        matiere: matiereId || undefined, // or s.MATIERE
+      }));
+      await studentsApi.bulkUpdateStatus(updates);
       toast.success("تم حفظ الحضور بنجاح", {
         description: `${presentCount} حاضر • ${absentCount} غائب`,
       });

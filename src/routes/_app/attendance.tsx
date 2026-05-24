@@ -40,6 +40,7 @@ function AttendancePage() {
   const [levelId, setLevelId]         = useState<string>("");
   const [filiereId, setFiliereId]     = useState<string>("");
   const [matiereId, setMatiereId]     = useState<string>("");
+  const [roomId, setRoomId]           = useState<string>("");
   const [query, setQuery]             = useState("");
   const [selected, setSelected]       = useState<Set<string>>(new Set());
   const [saving, setSaving]           = useState(false);
@@ -73,6 +74,7 @@ function AttendancePage() {
     if (!levelId) return;
     setLoadingStudents(true);
     setSelected(new Set());
+    setRoomId("");
     studentsApi.list({
       niveau: levelId,
       filiere: filiereId || undefined,
@@ -85,15 +87,24 @@ function AttendancePage() {
       .finally(() => setLoadingStudents(false));
   }, [levelId, filiereId, matiereId]);
 
+  const availableRooms = useMemo(() => {
+    const rooms = new Set<string>();
+    students.forEach(s => {
+      if (s.NSALLE) rooms.add(s.NSALLE);
+    });
+    return Array.from(rooms).sort();
+  }, [students]);
+
   const filtered = useMemo(() =>
     students.filter(
       (s) =>
-        s.NOM.includes(query) ||
+        (roomId ? s.NSALLE === roomId : true) &&
+        (s.NOM.includes(query) ||
         s.PRENOM.includes(query) ||
         s.ID.includes(query) ||
-        (s.NSALLE ?? "").includes(query)
+        (s.NSALLE ?? "").includes(query))
     ),
-    [students, query]
+    [students, query, roomId]
   );
 
   const presentCount = students.filter((s) => s.status === "present").length;
@@ -181,7 +192,7 @@ function AttendancePage() {
 
       <Card className="glass mb-4">
         <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
             {/* Level */}
             <div>
               <label className="text-xs text-muted-foreground mb-1.5 block">المستوى (NIVEAU)</label>
@@ -218,6 +229,20 @@ function AttendancePage() {
                   <SelectItem value="all">جميع المواد</SelectItem>
                   {matieres.map((m) => (
                     <SelectItem key={m} value={m}>{m}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Room */}
+            <div>
+              <label className="text-xs text-muted-foreground mb-1.5 block">القاعة (SALLE)</label>
+              <Select value={roomId || "all"} onValueChange={(v) => setRoomId(v === "all" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="الكل" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">جميع القاعات</SelectItem>
+                  {availableRooms.map((r) => (
+                    <SelectItem key={r} value={r}>{r}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

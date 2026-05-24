@@ -8,8 +8,5 @@
   },
   "env": {
     "VITE_API_URL": "https://precenceback.vercel.app"
-  },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ]
+  }
 }
